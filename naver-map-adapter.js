@@ -8,6 +8,7 @@
     flyTo(v,z){this.raw.morph(latLng(v),z??this.raw.getZoom());this._zoom=z??this._zoom;return this}
     getCenter(){return point(this.raw.getCenter())}
     distance(a,b){const p1=Array.isArray(a)?{lat:+a[0],lng:+a[1]}:point(a),p2=Array.isArray(b)?{lat:+b[0],lng:+b[1]}:point(b),r=6371000,dLat=(p2.lat-p1.lat)*Math.PI/180,dLng=(p2.lng-p1.lng)*Math.PI/180,x=Math.sin(dLat/2)**2+Math.cos(p1.lat*Math.PI/180)*Math.cos(p2.lat*Math.PI/180)*Math.sin(dLng/2)**2;return 2*r*Math.asin(Math.sqrt(x))}
+    on(name,fn){naver.maps.Event.addListener(this.raw,name,e=>fn({latlng:point(e.coord),originalEvent:e}));return this}
   }
   class LayerGroup{
     constructor(){this.items=[];groups.add(this)}

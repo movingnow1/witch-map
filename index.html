@@ -88,7 +88,7 @@
   <dialog id="bookingDialog"><form id="bookingForm" method="dialog" class="form-card"><button type="button" class="close" data-close>×</button><p class="eyebrow">RESERVATION</p><h2>예약 요청</h2><input type="hidden" name="placeId" /><label>예약자명<input name="name" required /></label><label>전화번호<input name="phone" type="tel" required placeholder="010-0000-0000" /></label><label>날짜와 시간<input type="datetime-local" name="date" required /></label><label>인원<input type="number" name="party" min="1" max="20" value="2" required /></label><label>요청사항<textarea name="note"></textarea></label><button class="primary">예약 요청 보내기</button></form></dialog>
 
   <div id="toast" role="status"></div>
-  <script src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=0ms3n6yqf0"></script>
+  <script src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=0ms3n6yqf0&submodules=geocoder"></script>
   <script src="naver-map-adapter.js"></script>
   <script src="app.js"></script>
 </body>
