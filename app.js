@@ -14,7 +14,7 @@ const store = {
 };
 let places=store.get('places',seedPlaces).map((p,i)=>({...p,hours:p.hours||'매일 10:00 - 22:00',image:p.image||'',phone:p.phone||'',menus:p.menus||[['아메리카노',4500],['시그니처 메뉴',12000]],reviews:p.reviews||['맛있어요','공간이 넓어요',i%2?'혼밥 가능':'모임에 좋아요'],pet:p.pet||i%3===0,solo:p.solo||i%2===0,ownerId:p.ownerId||'demo-owner',acceptingReservations:p.acceptingReservations??p.reservable})), visited=new Set(store.get('visited',[])), coupons=store.get('coupons',[]), bookings=store.get('bookings',[]), activeFilter='all', search='';
 const map=L.map('map',{zoomControl:false}).setView([37.52,126.89],10); L.control.zoom({position:'bottomright'}).addTo(map);
-L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png',{attribution:'© OpenStreetMap © CARTO',subdomains:'abcd',maxZoom:20}).addTo(map);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap',maxZoom:19}).addTo(map);
 let markerLayer=L.layerGroup().addTo(map);
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 function filtered(){return places.filter(p=>{const match=!search||`${p.name} ${p.area} ${p.desc}`.toLowerCase().includes(search); if(!match)return false; return activeFilter==='all'||(activeFilter==='visited'?visited.has(p.id):p[activeFilter]);});}
