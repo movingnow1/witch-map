@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#fff8ee" />
+  <title>마실지도 — 서울·인천 카페와 식당 탐험</title>
+  <link rel="preconnect" href="https://unpkg.com" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <button class="brand" id="homeBtn" aria-label="전체 지도 보기"><span>ㅁㅅ</span><b>마실지도</b></button>
+      <div class="search-wrap"><span>⌕</span><input id="searchInput" placeholder="동네, 카페, 식당 검색" aria-label="장소 검색" /></div>
+      <button class="icon-btn" id="openReport" title="장소 정보 제보">＋ 제보</button>
+      <button class="avatar" id="openOwner" title="점주 센터">점주</button>
+    </header>
+
+    <main>
+      <section class="map-panel">
+        <div id="map" aria-label="서울 인천 장소 지도"></div>
+        <div class="filter-bar" aria-label="지도 필터">
+          <button class="filter active" data-filter="all">전체</button>
+          <button class="filter" data-filter="parking">🚙 건물 내 주차</button>
+          <button class="filter" data-filter="publicParking">🅿 공용주차장</button>
+          <button class="filter" data-filter="cozy">🛋 편안해요</button>
+          <button class="filter" data-filter="quiet">☁ 한적해요</button>
+          <button class="filter" data-filter="visited">✓ 탐험 완료</button>
+        </div>
+        <div class="legend"><span><i class="dot cafe"></i>카페</span><span><i class="dot food"></i>식당</span><span><i class="dot done"></i>탐험 완료</span></div>
+      </section>
+
+      <aside class="side-panel">
+        <div class="panel-heading">
+          <div><p class="eyebrow">SEOUL · INCHEON</p><h1 id="resultTitle">오늘 어디로<br />마실 갈까요?</h1></div>
+          <p id="resultCount"></p>
+        </div>
+        <div id="placeList" class="place-list"></div>
+        <div class="progress-card">
+          <div class="progress-copy"><span>나의 동네 탐험</span><b id="progressText">0곳 완료</b></div>
+          <div class="progress-track"><i id="progressBar"></i></div>
+          <small>직접 다녀온 곳을 체크하면 지도에 민트색 영토가 생겨요.</small>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <dialog id="detailDialog"><div id="detailContent"></div></dialog>
+  <dialog id="reportDialog">
+    <form id="reportForm" method="dialog" class="form-card">
+      <button type="button" class="close" data-close>×</button><p class="eyebrow">COMMUNITY REPORT</p><h2>다녀온 장소 알려주기</h2>
+      <label>장소<select id="reportPlace" required></select></label>
+      <fieldset><legend>어떤 특징이 있었나요?</legend><label class="check"><input type="checkbox" name="parking" /> 건물 내 주차 가능</label><label class="check"><input type="checkbox" name="cozy" /> 소파·분리 공간이 있어 편안함</label><label class="check"><input type="checkbox" name="quiet" /> 사람이 적어 한적함</label></fieldset>
+      <label>한적했던 시간대<select name="quietTime"><option value="">선택 안 함</option><option>평일 낮</option><option>평일 저녁</option><option>토·일</option></select></label>
+      <label>한 줄 메모<textarea name="note" maxlength="120" placeholder="직접 확인한 정보를 적어주세요"></textarea></label>
+      <button class="primary" type="submit">제보 반영하기</button>
+    </form>
+  </dialog>
+  <dialog id="ownerDialog">
+    <div class="form-card owner-card"><button type="button" class="close" data-close>×</button><p class="eyebrow">OWNER STUDIO</p><h2>점주 센터</h2>
+      <div class="tabs"><button class="tab active" data-tab="coupon">쿠폰 등록</button><button class="tab" data-tab="booking">예약 관리</button></div>
+      <form id="couponForm" class="tab-pane active" data-pane="coupon">
+        <label>내 가게<select name="placeId" class="ownerPlace"></select></label><label>쿠폰 이름<input name="title" required placeholder="예: 아메리카노 1잔 무료" /></label><label>사용 조건<input name="condition" required placeholder="예: 2만원 이상 주문 시" /></label><label>사용 기한<input type="date" name="expires" required /></label><button class="primary">쿠폰 발행</button>
+      </form>
+      <div class="tab-pane" data-pane="booking"><div id="bookingList"></div></div>
+    </div>
+  </dialog>
+  <dialog id="bookingDialog"><form id="bookingForm" method="dialog" class="form-card"><button type="button" class="close" data-close>×</button><p class="eyebrow">RESERVATION</p><h2>예약 요청</h2><input type="hidden" name="placeId" /><label>이름<input name="name" required /></label><label>날짜와 시간<input type="datetime-local" name="date" required /></label><label>인원<input type="number" name="party" min="1" max="20" value="2" required /></label><label>요청사항<textarea name="note"></textarea></label><button class="primary">예약 요청 보내기</button></form></dialog>
+
+  <div id="toast" role="status"></div>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
+
