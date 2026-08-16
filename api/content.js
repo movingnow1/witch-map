@@ -40,6 +40,14 @@ export default async function handler(req,res){
       await collection.updateOne({_id:item._id},{$set:update});
       return res.status(200).json({ok:true});
     }
+    if(req.body?.action==='updateFestival'){
+      if(item.kind!=='festival'||session.user.role!=='admin')return res.status(403).json({message:'관리자만 지역축제를 수정할 수 있습니다.'});
+      const source=req.body.festival||{},fields=['name','area','hours','desc','eventContent','startDate','endDate','externalUrl','image'];
+      const update=Object.fromEntries(fields.filter(key=>source[key]!==undefined).map(key=>[key,source[key]]));
+      update.updatedAt=new Date();update.updatedBy=session.user.id;
+      await collection.updateOne({_id:item._id},{$set:update});
+      return res.status(200).json({ok:true});
+    }
   }
   if(req.method==='DELETE'){
     const id=String(req.query?.id||req.body?.id||'');
