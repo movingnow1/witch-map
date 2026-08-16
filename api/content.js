@@ -22,13 +22,24 @@ export default async function handler(req,res){
       if(item.kind!=='store'||item.ownerId)return res.status(409).json({message:'연결할 수 없는 가게입니다.'});
       await collection.updateOne({_id:item._id},{$set:{ownerId:session.user.id,claimedAt:new Date()}});return res.status(200).json({ok:true,ownerId:session.user.id})
     }
+    if(req.body?.action==='updatePosition'){
+      const allowed=session.user.role==='admin'||item.createdBy===session.user.id||item.ownerId===session.user.id;
+      if(item.kind!=='store'||!allowed)return res.status(403).json({message:'등록자·점주·관리자만 위치를 수정할 수 있습니다.'});
+      const lat=Number(req.body.lat),lng=Number(req.body.lng);
+      if(!Number.isFinite(lat)||!Number.isFinite(lng))return res.status(400).json({message:'올바른 지도 위치가 아닙니다.'});
+      await collection.updateOne({_id:item._id},{$set:{lat,lng,positionCorrectedBy:session.user.id,positionCorrectedAt:new Date()}});
+      return res.status(200).json({ok:true,lat,lng});
+    }
   }
   if(req.method==='DELETE'){
-    if(session.user.role!=='admin')return res.status(403).json({message:'관리자만 삭제할 수 있습니다.'});
     const id=String(req.query?.id||req.body?.id||'');
     if(!ObjectId.isValid(id))return res.status(400).json({message:'삭제할 항목을 확인해주세요.'});
-    const result=await collection.deleteOne({_id:new ObjectId(id),kind:'ad'});
-    if(!result.deletedCount)return res.status(404).json({message:'광고 배너를 찾지 못했습니다.'});
+    const item=await collection.findOne({_id:new ObjectId(id)});
+    if(!item)return res.status(404).json({message:'삭제할 항목을 찾지 못했습니다.'});
+    const allowed=session.user.role==='admin'||(item.kind==='store'&&(item.createdBy===session.user.id||item.ownerId===session.user.id));
+    if(!allowed)return res.status(403).json({message:'등록한 이용자·해당 점주·관리자만 삭제할 수 있습니다.'});
+    const result=await collection.deleteOne({_id:item._id});
+    if(!result.deletedCount)return res.status(404).json({message:'삭제할 항목을 찾지 못했습니다.'});
     return res.status(200).json({ok:true});
   }
   return res.status(405).json({message:'Method not allowed'});

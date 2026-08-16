@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#fff8ee" />
-  <title>마실지도 — 서울·인천 카페와 식당 탐험</title>
+  <meta name="theme-color" content="#edf7df" />
+  <title>모험지도 — 서울·인천 동네 탐험</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="alternate icon" href="/favicon.svg" />
   <link rel="preconnect" href="https://oapi.map.naver.com" />
@@ -13,8 +13,8 @@
 <body>
   <div id="particleField" aria-hidden="true"></div><div id="cursorGlow" aria-hidden="true"></div>
   <section id="authGate" class="auth-gate">
-    <div class="auth-visual"><div class="auth-logo">ㅁㅅ</div><p class="eyebrow">SEOUL · INCHEON</p><h1>내 취향의 동네를<br>천천히 탐험해요.</h1><p>주차가 편한 곳, 오래 머물기 좋은 곳,<br>조용한 시간까지 한눈에.</p></div>
-    <div class="auth-card"><p class="eyebrow">WELCOME TO MASIL</p><h2>마실지도 시작하기</h2>
+    <div class="auth-visual"><div class="auth-logo">모험</div><p class="eyebrow">SEOUL · INCHEON</p><h1>내 취향의 동네를<br>천천히 탐험해요.</h1><p>주차가 편한 곳, 오래 머물기 좋은 곳,<br>조용한 시간까지 한눈에.</p></div>
+    <div class="auth-card"><p class="eyebrow">WELCOME TO ADVENTURE</p><h2>모험지도 시작하기</h2>
       <div class="role-switch"><button class="role active" data-role="user">일반 이용자</button><button class="role" data-role="owner">점주</button><button class="role" data-role="admin">관리자</button></div>
       <form id="loginForm" class="auth-form"><input type="hidden" name="role" value="user"><label>아이디 또는 이메일<input name="email" type="email" required placeholder="hello@example.com"></label><label>비밀번호<span class="password-field"><input name="password" type="password" required minlength="6" placeholder="6자 이상"><button type="button" class="password-toggle" aria-label="비밀번호 표시" aria-pressed="false">👁</button></span></label><label class="remember"><input type="checkbox" name="remember" checked> 로그인 유지</label><button class="primary">로그인</button></form>
       <div class="auth-links"><button id="showSignup">자체 가입</button><button id="showRecovery">아이디·비밀번호 찾기</button></div>
@@ -23,7 +23,7 @@
   </section>
   <div class="app-shell">
     <header class="topbar">
-      <button class="brand" id="homeBtn" aria-label="전체 지도 보기"><span>ㅁㅅ</span><b>마실지도</b></button>
+      <button class="brand" id="homeBtn" aria-label="전체 지도 보기"><span>모험</span><b>모험지도</b></button>
       <div class="search-box"><div class="search-wrap"><span>⌕</span><input id="searchInput" placeholder="동네, 카페, 식당 검색" aria-label="장소 검색" /><button id="quickAdd" title="새 장소 등록">＋</button></div><div id="searchSuggestions" class="search-suggestions"></div></div>
       <a id="promoBanner" class="promo-banner" href="#" target="_blank" rel="noopener" hidden><img alt="동네 가게 광고"></a>
       <button class="icon-btn community-open" id="openCommunity">커뮤니티</button>
@@ -50,6 +50,9 @@
       </section>
 
       <aside class="side-panel">
+        <nav class="side-tabs" aria-label="우측 보기 전환"><button id="showPlacesSide" class="active">장소</button><button id="showCommunitySide">커뮤니티</button></nav>
+        <section id="communitySidePanel" hidden><div class="community-side-head"><div><p class="eyebrow">COMMUNITY</p><h2>모임 선택</h2></div><button id="createCommunitySide" class="primary">＋ 모임 만들기</button></div><div id="communitySideList" class="community-list"></div></section>
+        <div id="placesSidePanel">
         <div class="panel-heading">
           <div><p class="eyebrow">SEOUL · INCHEON</p><h1 id="resultTitle">오늘 어디로<br />마실 갈까요?</h1></div>
           <p id="resultCount"></p>
@@ -59,6 +62,7 @@
           <div class="progress-copy"><span>나의 동네 탐험</span><b id="progressText">0곳 완료</b></div>
           <div class="progress-track"><i id="progressBar"></i></div>
           <small>직접 다녀온 곳을 체크하면 지도에 민트색 영토가 생겨요.</small>
+        </div>
         </div>
       </aside>
     </main>
