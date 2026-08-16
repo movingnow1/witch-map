@@ -40,10 +40,20 @@ export default async function handler(req,res){
       await collection.updateOne({_id:item._id},{$set:update});
       return res.status(200).json({ok:true});
     }
+    if(req.body?.action==='updateNotice'){
+      if(item.kind!=='notice'||session.user.role!=='admin')return res.status(403).json({message:'관리자만 공지를 수정할 수 있습니다.'});
+      const source=req.body.notice||{},update={};
+      if(source.text!==undefined)update.text=String(source.text).slice(0,3000);
+      if(Array.isArray(source.images))update.images=source.images.slice(0,10);
+      update.updatedAt=new Date();update.updatedBy=session.user.id;
+      await collection.updateOne({_id:item._id},{$set:update});
+      return res.status(200).json({ok:true});
+    }
     if(req.body?.action==='updateFestival'){
       if(item.kind!=='festival'||session.user.role!=='admin')return res.status(403).json({message:'관리자만 지역축제를 수정할 수 있습니다.'});
       const source=req.body.festival||{},fields=['name','area','hours','desc','eventContent','startDate','endDate','externalUrl','image'];
       const update=Object.fromEntries(fields.filter(key=>source[key]!==undefined).map(key=>[key,source[key]]));
+      if(update.desc!==undefined)update.eventContent=update.desc;
       update.updatedAt=new Date();update.updatedBy=session.user.id;
       await collection.updateOne({_id:item._id},{$set:update});
       return res.status(200).json({ok:true});
