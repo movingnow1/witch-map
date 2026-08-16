@@ -17,6 +17,7 @@ const map=L.map('map',{zoomControl:false}).setView([37.52,126.89],10); L.control
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap',maxZoom:19}).addTo(map);
 let markerLayer=L.layerGroup().addTo(map);
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+document.addEventListener('click',event=>{const button=event.target.closest('.password-toggle');if(!button)return;const input=button.closest('.password-field')?.querySelector('input');if(!input)return;const show=input.type==='password';input.type=show?'text':'password';button.setAttribute('aria-pressed',String(show));button.setAttribute('aria-label',show?'비밀번호 숨기기':'비밀번호 표시');button.textContent=show?'🙈':'👁'});
 function filtered(){return places.filter(p=>{const match=!search||`${p.name} ${p.area} ${p.desc}`.toLowerCase().includes(search); if(!match)return false; return activeFilter==='all'||(activeFilter==='visited'?visited.has(p.id):p[activeFilter]);});}
 function color(p){return visited.has(p.id)?'#40a987':p.type==='cafe'?'#ed744f':'#5387b8'}
 function markerIcon(p){return L.divIcon({className:'',html:`<div class="custom-marker" style="background:${p.festival?'#8b5cf6':color(p)}"><span>${p.festival?'★':p.type==='cafe'?'☕':'⌂'}</span></div>`,iconSize:[35,35],iconAnchor:[17,34]})}
