@@ -23,5 +23,13 @@ export default async function handler(req,res){
       await collection.updateOne({_id:item._id},{$set:{ownerId:session.user.id,claimedAt:new Date()}});return res.status(200).json({ok:true,ownerId:session.user.id})
     }
   }
+  if(req.method==='DELETE'){
+    if(session.user.role!=='admin')return res.status(403).json({message:'관리자만 삭제할 수 있습니다.'});
+    const id=String(req.query?.id||req.body?.id||'');
+    if(!ObjectId.isValid(id))return res.status(400).json({message:'삭제할 항목을 확인해주세요.'});
+    const result=await collection.deleteOne({_id:new ObjectId(id),kind:'ad'});
+    if(!result.deletedCount)return res.status(404).json({message:'광고 배너를 찾지 못했습니다.'});
+    return res.status(200).json({ok:true});
+  }
   return res.status(405).json({message:'Method not allowed'});
 }
