@@ -23,8 +23,9 @@ export default async function handler(req,res){
       await collection.updateOne({_id:item._id},{$set:{ownerId:session.user.id,claimedAt:new Date()}});return res.status(200).json({ok:true,ownerId:session.user.id})
     }
     if(req.body?.action==='updatePosition'){
-      const allowed=session.user.role==='admin'||item.createdBy===session.user.id||item.ownerId===session.user.id;
-      if(item.kind!=='store'||!allowed)return res.status(403).json({message:'등록자·점주·관리자만 위치를 수정할 수 있습니다.'});
+      const isStore=item.kind==='store',isFestival=item.kind==='festival';
+      const allowed=session.user.role==='admin'||(isStore&&(item.createdBy===session.user.id||item.ownerId===session.user.id));
+      if((!isStore&&!isFestival)||!allowed)return res.status(403).json({message:'해당 점주·등록자 또는 관리자만 위치를 수정할 수 있습니다.'});
       const lat=Number(req.body.lat),lng=Number(req.body.lng);
       if(!Number.isFinite(lat)||!Number.isFinite(lng))return res.status(400).json({message:'올바른 지도 위치가 아닙니다.'});
       await collection.updateOne({_id:item._id},{$set:{lat,lng,positionCorrectedBy:session.user.id,positionCorrectedAt:new Date()}});
