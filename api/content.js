@@ -30,6 +30,15 @@ export default async function handler(req,res){
       await collection.updateOne({_id:item._id},{$set:{lat,lng,positionCorrectedBy:session.user.id,positionCorrectedAt:new Date()}});
       return res.status(200).json({ok:true,lat,lng});
     }
+    if(req.body?.action==='updateStore'){
+      const allowed=session.user.role==='admin'||item.createdBy===session.user.id||item.ownerId===session.user.id;
+      if(item.kind!=='store'||!allowed)return res.status(403).json({message:'해당 점주와 관리자만 가게 정보를 수정할 수 있습니다.'});
+      const source=req.body.store||{},fields=['name','type','area','hours','phone','desc','image','menuBoard','ownerGallery','menus','businessStatus','closedDate','parking','publicParking','cozy','quiet','open24','solo','groupFriendly','pet','splitRoom'];
+      const update=Object.fromEntries(fields.filter(key=>source[key]!==undefined).map(key=>[key,source[key]]));
+      update.updatedAt=new Date();update.updatedBy=session.user.id;
+      await collection.updateOne({_id:item._id},{$set:update});
+      return res.status(200).json({ok:true});
+    }
   }
   if(req.method==='DELETE'){
     const id=String(req.query?.id||req.body?.id||'');
