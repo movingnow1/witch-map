@@ -1,0 +1,12 @@
+{
+  "name": "witch-map",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=20" },
+  "dependencies": {
+    "@better-auth/mongo-adapter": "latest",
+    "better-auth": "latest",
+    "mongodb": "latest"
+  }
+}
