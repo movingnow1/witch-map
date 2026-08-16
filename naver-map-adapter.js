@@ -9,6 +9,8 @@
     getCenter(){return point(this.raw.getCenter())}
     distance(a,b){const p1=Array.isArray(a)?{lat:+a[0],lng:+a[1]}:point(a),p2=Array.isArray(b)?{lat:+b[0],lng:+b[1]}:point(b),r=6371000,dLat=(p2.lat-p1.lat)*Math.PI/180,dLng=(p2.lng-p1.lng)*Math.PI/180,x=Math.sin(dLat/2)**2+Math.cos(p1.lat*Math.PI/180)*Math.cos(p2.lat*Math.PI/180)*Math.sin(dLng/2)**2;return 2*r*Math.asin(Math.sqrt(x))}
     on(name,fn){naver.maps.Event.addListener(this.raw,name,e=>fn({latlng:point(e.coord),originalEvent:e}));return this}
+    clearRoute(){if(this.routeLine)this.routeLine.setMap(null);this.routeLine=null;return this}
+    drawRoute(path,{color='#ed744f',weight=7}={}){this.clearRoute();const coords=path.map(v=>new naver.maps.LatLng(+v[1],+v[0]));this.routeLine=new naver.maps.Polyline({map:this.raw,path:coords,strokeColor:color,strokeWeight:weight,strokeOpacity:.9,strokeLineCap:'round',strokeLineJoin:'round'});const bounds=new naver.maps.LatLngBounds();coords.forEach(v=>bounds.extend(v));this.raw.fitBounds(bounds,{top:90,right:40,bottom:90,left:40});return this}
   }
   class LayerGroup{
     constructor(){this.items=[];groups.add(this)}
