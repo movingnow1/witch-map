@@ -43,6 +43,8 @@ export default async function handler(req,res){
     if(req.body?.action==='updateNotice'){
       if(item.kind!=='notice'||session.user.role!=='admin')return res.status(403).json({message:'관리자만 공지를 수정할 수 있습니다.'});
       const source=req.body.notice||{},update={};
+      if(source.title!==undefined)update.title=String(source.title).slice(0,120);
+      if(source.noticeDate!==undefined)update.noticeDate=String(source.noticeDate).slice(0,10);
       if(source.text!==undefined)update.text=String(source.text).slice(0,3000);
       if(Array.isArray(source.images))update.images=source.images.slice(0,10);
       update.updatedAt=new Date();update.updatedBy=session.user.id;

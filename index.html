@@ -52,7 +52,8 @@
       </section>
 
       <aside class="side-panel">
-        <nav class="side-tabs" aria-label="우측 보기 전환"><button id="showPlacesSide" class="active">장소</button><button id="showCommunitySide">커뮤니티</button></nav>
+        <nav class="side-tabs" aria-label="우측 보기 전환"><button id="showPlacesSide" class="active">장소</button><button id="showVisitedSide" hidden>탐험 완료</button><button id="showCommunitySide">커뮤니티</button></nav>
+        <section id="visitedSidePanel" hidden><div class="community-side-head"><div><p class="eyebrow">MY ADVENTURE</p><h2>탐험 완료</h2></div></div><div id="visitedSideList" class="place-list"></div></section>
         <section id="communitySidePanel" hidden><div class="community-side-head"><div><p class="eyebrow">COMMUNITY</p><h2>모임 선택</h2></div><button id="createCommunitySide" class="primary">＋ 모임 만들기</button></div><div id="communitySideList" class="community-list"></div></section>
         <div id="placesSidePanel">
         <div class="panel-heading">
