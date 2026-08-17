@@ -1,0 +1,27 @@
+import { ObjectId } from 'mongodb';
+import { fromNodeHeaders } from 'better-auth/node';
+import { auth } from '../lib/auth.js';
+import { database } from '../lib/mongodb.js';
+
+const privateCommunityFields=['messages','notices','ownerPolls','memberNames','members'];
+export default async function handler(req,res){
+  const session=await auth.api.getSession({headers:fromNodeHeaders(req.headers)});
+  if(!session?.user)return res.status(401).json({message:'로그인이 필요합니다.'});
+  const resource=String(req.query?.resource||''),userId=session.user.id,isAdmin=session.user.role==='admin';
+  if(resource==='state'){
+    const collection=database.collection('userState');
+    if(req.method==='GET')return res.status(200).json({state:await collection.findOne({userId})||{userId,visited:[],contributionCount:0}});
+    if(req.method==='PATCH'){const update={updatedAt:new Date()};if(Array.isArray(req.body?.visited))update.visited=[...new Set(req.body.visited.map(String))].slice(0,2000);if(Number.isFinite(Number(req.body?.contributionCount)))update.contributionCount=Math.max(0,Math.floor(Number(req.body.contributionCount)));await collection.updateOne({userId},{$set:update,$setOnInsert:{createdAt:new Date()}},{upsert:true});return res.status(200).json({ok:true})}
+  }
+  if(resource==='rankings'&&req.method==='GET'){
+    const states=await database.collection('userState').find({contributionCount:{$gt:0}}).sort({contributionCount:-1}).limit(30).toArray(),objectIds=states.map(x=>x.userId).filter(ObjectId.isValid).map(id=>new ObjectId(id)),users=await database.collection('user').find({_id:{$in:objectIds}},{projection:{name:1,userType:1,role:1}}).toArray(),userMap=Object.fromEntries(users.map(x=>[String(x._id),x]));
+    const ranking=states.filter(x=>{const u=userMap[x.userId];return u&&(u.userType||'user')==='user'&&u.role!=='admin'&&!/codex|관리자|운영자/i.test(u.name||'')}).slice(0,3).map(x=>({id:x.userId,name:userMap[x.userId].name||'이용자',count:x.contributionCount}));return res.status(200).json({ranking});
+  }
+  if(resource==='communities'){
+    const collection=database.collection('communities');
+    if(req.method==='GET'){const items=await collection.find({}).sort({updatedAt:-1}).limit(200).toArray();return res.status(200).json({communities:items.map(item=>{const c={...item,_id:undefined,id:item.communityId,memberCount:(item.members||[]).length},member=isAdmin||c.ownerId===userId||(c.members||[]).includes(userId);if(!member)for(const key of privateCommunityFields)delete c[key];return c})})}
+    if(req.method==='POST'&&req.body?.action==='join'){const communityId=String(req.body.id||''),old=await collection.findOne({communityId});if(!old)return res.status(404).json({message:'모임을 찾지 못했습니다.'});if((old.members||[]).length>=Number(old.headcount||999)&&!(old.members||[]).includes(userId))return res.status(409).json({message:'모집 인원이 마감됐습니다.'});await collection.updateOne({communityId},{$addToSet:{members:userId},$set:{[`memberNames.${userId}`]:session.user.name||'참여자',updatedAt:new Date()}});return res.status(200).json({ok:true})}
+    if(req.method==='PUT'){const items=Array.isArray(req.body?.communities)?req.body.communities.slice(0,200):[];for(const source of items){const communityId=String(source.id||'');if(!communityId)continue;const old=await collection.findOne({communityId}),allowed=isAdmin||old?.ownerId===userId||(!old&&source.ownerId===userId);if(!allowed)continue;const clean={...source,communityId,updatedAt:new Date()};delete clean._id;delete clean.id;await collection.updateOne({communityId},{$set:clean,$setOnInsert:{createdAt:new Date()}},{upsert:true})}return res.status(200).json({ok:true})}
+  }
+  return res.status(405).json({message:'지원하지 않는 동기화 요청입니다.'});
+}
