@@ -13,6 +13,7 @@ export default async function handler(req,res){
   if(req.method==='POST'){
     const storeRequest=req.body?.kind==='store',ownerStore=session.user.userType==='owner'&&storeRequest;
     if(session.user.role!=='admin'&&!storeRequest)return res.status(403).json({message:'가게 외 공용 콘텐츠는 관리자만 등록할 수 있습니다.'});
+    if(storeRequest){const duplicate=await collection.findOne({kind:'store',name:String(req.body?.name||''),area:String(req.body?.area||'')});if(duplicate)return res.status(200).json({item:{...duplicate,id:String(duplicate._id),_id:undefined},existing:true})}
     const item={...req.body,createdAt:new Date(),createdBy:session.user.id};delete item.id;delete item._id;
     if(ownerStore){item.ownerId=session.user.id;item.claimable=false}else if(storeRequest&&session.user.role!=='admin'){delete item.ownerId;item.claimable=true}
     const result=await collection.insertOne(item);return res.status(201).json({item:{...item,id:String(result.insertedId)}})

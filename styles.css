@@ -47,3 +47,10 @@ body:has(.auth-gate.hidden){--paper:#fff;--cream:#f6f6f2;--line:#deded8;backgrou
 body.logged-in{--paper:#fff;--cream:#f6f6f2;--line:#deded8;background:#fff}body.logged-in .app-shell,body.logged-in .side-panel,body.logged-in dialog{background:#fff}body.logged-in .topbar{background:rgba(255,255,255,.97)}
 
 @media(max-width:800px){.side-tabs{grid-template-columns:repeat(3,minmax(0,1fr));display:grid}.side-tabs button{min-width:0;white-space:nowrap;font-size:12px;padding:10px 4px}.filter-bar{scrollbar-width:thin}}
+
+/* 모바일 상단 명칭과 하단 콘텐츠 스크롤 안정화 */
+.joined-community{border-color:#8eb779;background:#fbfff7}.community-leave{color:#a64b3c;border-color:#e6a69b!important}
+@media(max-width:800px){
+#openAccountSettings::after{content:'계정';font-size:11px}#openReport::after{content:'＋ 제보';font-size:11px}.topbar .icon-btn{min-width:48px;padding:9px 8px}
+main{height:calc(100dvh - 112px);min-height:0;overflow:hidden}.map-panel{height:52%;min-height:0}.side-panel{height:48%;min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding-bottom:max(34px,env(safe-area-inset-bottom))}.side-tabs{background:#edf5e5}.community-item-actions .compact{margin-left:0}.community-preview-footer button:disabled{opacity:.75}
+}
