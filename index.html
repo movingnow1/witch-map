@@ -18,6 +18,7 @@
       <div class="role-switch"><button class="role active" data-role="user">일반 이용자</button><button class="role" data-role="owner">점주</button><button class="role" data-role="admin">관리자</button></div>
       <form id="loginForm" class="auth-form"><input type="hidden" name="role" value="user"><label>가입 이메일<input name="email" type="email" required autocomplete="email" placeholder="hello@example.com"></label><label>비밀번호<span class="password-field"><input name="password" type="password" required minlength="6" autocomplete="current-password" placeholder="6자 이상"><button type="button" class="password-toggle" aria-label="비밀번호 표시" aria-pressed="false">👁</button></span></label><p id="loginFeedback" class="login-feedback" role="alert" aria-live="polite"></p><label class="remember"><input type="checkbox" name="remember" checked> 로그인 유지</label><button class="primary" type="submit">로그인</button></form>
       <div class="auth-links"><button id="showSignup">자체 가입</button><button id="showRecovery">아이디·비밀번호 찾기</button></div>
+      <div class="social-login social-login-main"><button id="naverSocialLogin" type="button" class="naver">N 네이버로 가입·로그인</button></div>
       <button id="demoLogin" class="guest">데모로 먼저 둘러보기</button>
     </div>
   </section>
