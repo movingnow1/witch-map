@@ -9,10 +9,10 @@ export default async function handler(req,res){
   if(req.method==='GET'){const items=await collection.find({}).sort({createdAt:-1}).limit(500).toArray();return res.status(200).json({items:items.map(x=>({...x,id:String(x._id),_id:undefined}))})}
   const session=await sessionFor(req);if(!session?.user)return res.status(401).json({message:'로그인이 필요합니다.'});
   if(req.method==='POST'){
-    const ownerStore=session.user.userType==='owner'&&req.body?.kind==='store';
-    if(session.user.role!=='admin'&&!ownerStore)return res.status(403).json({message:'관리자만 등록할 수 있습니다.'});
+    const storeRequest=req.body?.kind==='store',ownerStore=session.user.userType==='owner'&&storeRequest;
+    if(session.user.role!=='admin'&&!storeRequest)return res.status(403).json({message:'가게 외 공용 콘텐츠는 관리자만 등록할 수 있습니다.'});
     const item={...req.body,createdAt:new Date(),createdBy:session.user.id};delete item.id;delete item._id;
-    if(ownerStore){item.ownerId=session.user.id;item.claimable=false}
+    if(ownerStore){item.ownerId=session.user.id;item.claimable=false}else if(storeRequest&&session.user.role!=='admin'){delete item.ownerId;item.claimable=true}
     const result=await collection.insertOne(item);return res.status(201).json({item:{...item,id:String(result.insertedId)}})
   }
   if(req.method==='PATCH'){
