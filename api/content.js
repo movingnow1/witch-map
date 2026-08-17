@@ -2,9 +2,11 @@ import { ObjectId } from 'mongodb';
 import { fromNodeHeaders } from 'better-auth/node';
 import { auth } from '../lib/auth.js';
 import { database } from '../lib/mongodb.js';
+import { handleSync } from '../lib/sync-handler.js';
 
 async function sessionFor(req){return auth.api.getSession({headers:fromNodeHeaders(req.headers)})}
 export default async function handler(req,res){
+  if(req.query?.resource)return handleSync(req,res);
   const collection=database.collection('mapContent');
   if(req.method==='GET'){const items=await collection.find({}).sort({createdAt:-1}).limit(500).toArray();return res.status(200).json({items:items.map(x=>({...x,id:String(x._id),_id:undefined}))})}
   const session=await sessionFor(req);if(!session?.user)return res.status(401).json({message:'로그인이 필요합니다.'});
