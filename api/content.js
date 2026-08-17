@@ -23,7 +23,11 @@ export default async function handler(req,res){
     if(req.body?.action==='claim'){
       if(session.user.userType!=='owner')return res.status(403).json({message:'점주 계정만 내 가게로 연결할 수 있습니다.'});
       if(item.kind!=='store'||item.ownerId)return res.status(409).json({message:'연결할 수 없는 가게입니다.'});
-      await collection.updateOne({_id:item._id},{$set:{ownerId:session.user.id,claimedAt:new Date()}});return res.status(200).json({ok:true,ownerId:session.user.id})
+      await collection.updateOne({_id:item._id},{$set:{ownerId:session.user.id,claimedAt:new Date(),claimable:false}});return res.status(200).json({ok:true,ownerId:session.user.id})
+    }
+    if(req.body?.action==='unclaim'){
+      if(item.kind!=='store'||item.ownerId!==session.user.id)return res.status(403).json({message:'현재 연결된 점주만 내 가게 연결을 해제할 수 있습니다.'});
+      await collection.updateOne({_id:item._id},{$unset:{ownerId:'',claimedAt:''},$set:{claimable:true,updatedAt:new Date()}});return res.status(200).json({ok:true})
     }
     if(req.body?.action==='updatePosition'){
       const isStore=item.kind==='store',isFestival=item.kind==='festival';
