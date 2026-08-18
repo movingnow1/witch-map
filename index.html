@@ -17,7 +17,7 @@
     <div class="auth-card"><p class="eyebrow">WELCOME TO ADVENTURE</p><h2>모험지도 시작하기</h2>
       <div class="social-signup-guide"><b>가입 및 로그인 시 일반 이용자·점주 중 먼저 선택해주세요.</b><span>네이버 연동 가입·로그인을 추천드려요. Google 연동은 준비 중입니다.</span></div>
       <div class="role-switch"><button class="role active" data-role="user">일반 이용자</button><button class="role" data-role="owner">점주</button><button class="role" data-role="admin">관리자</button></div>
-      <div class="social-login social-login-main"><button id="naverSocialLogin" type="button" class="naver">N 네이버로 가입·로그인</button><small class="naver-account-note">다른 네이버 계정으로 가입하려면 먼저 네이버에서 현재 계정을 로그아웃해주세요.</small></div>
+      <div class="social-login social-login-main"><button id="naverSocialLogin" type="button" class="naver">N 네이버로 가입·로그인</button><small class="naver-account-note">네이버 버튼을 누를 때마다 사용할 네이버 아이디를 직접 입력할 수 있어요.</small></div>
       <form id="loginForm" class="auth-form"><input type="hidden" name="role" value="user"><label>가입 이메일<input name="email" type="email" required autocomplete="email" placeholder="hello@example.com"></label><label>비밀번호<span class="password-field"><input name="password" type="password" required minlength="6" autocomplete="current-password" placeholder="6자 이상"><button type="button" class="password-toggle" aria-label="비밀번호 표시" aria-pressed="false">👁</button></span></label><p id="loginFeedback" class="login-feedback" role="alert" aria-live="polite"></p><label class="remember"><input type="checkbox" name="remember" checked> 로그인 유지</label><button class="primary" type="submit">로그인</button></form>
       <div class="auth-links"><button id="showSignup">기존 방식 자체 가입</button><button id="showRecovery">아이디·비밀번호 찾기</button></div>
       <button id="demoLogin" class="guest">데모로 먼저 둘러보기</button>
@@ -109,6 +109,6 @@
   <script src="app-config.js"></script>
   <script src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=0ms3n6yqf0&submodules=geocoder"></script>
   <script src="naver-map-adapter.js"></script>
-  <script src="app.js?v=20260817-4"></script>
+  <script src="app.js?v=20260818-1"></script>
 </body>
 </html>
