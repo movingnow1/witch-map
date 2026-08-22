@@ -8,7 +8,7 @@ async function sessionFor(req){return auth.api.getSession({headers:fromNodeHeade
 export default async function handler(req,res){
   if(req.query?.resource)return handleSync(req,res);
   const collection=database.collection('mapContent');
-  if(req.method==='GET'){const items=await collection.find({}).sort({createdAt:-1}).limit(500).toArray();return res.status(200).json({items:items.map(x=>({...x,id:String(x._id),_id:undefined}))})}
+  if(req.method==='GET'){await collection.updateMany({kind:'store',name:{$regex:'^해나루\\s*김밥$',$options:'i'},cozyReset20260822:{$ne:true}},{$set:{cozy:false,'featureVotes.cozy':0,'featureVoters.cozy':[],cozyReset20260822:true,updatedAt:new Date()}});const items=await collection.find({}).sort({createdAt:-1}).limit(500).toArray();return res.status(200).json({items:items.map(x=>({...x,id:String(x._id),_id:undefined}))})}
   const session=await sessionFor(req);if(!session?.user)return res.status(401).json({message:'로그인이 필요합니다.'});
   if(req.method==='POST'){
     const storeRequest=req.body?.kind==='store',ownerStore=session.user.userType==='owner'&&storeRequest;
@@ -37,6 +37,14 @@ export default async function handler(req,res){
       if(!Number.isFinite(lat)||!Number.isFinite(lng))return res.status(400).json({message:'올바른 지도 위치가 아닙니다.'});
       await collection.updateOne({_id:item._id},{$set:{lat,lng,positionCorrectedBy:session.user.id,positionCorrectedAt:new Date()}});
       return res.status(200).json({ok:true,lat,lng});
+    }
+    if(req.body?.action==='updateStoreBasic'){
+      if(item.kind!=='store')return res.status(400).json({message:'가게 정보만 수정할 수 있습니다.'});
+      const source=req.body.store||{},fields=['name','type','area','hours','desc'];
+      const update=Object.fromEntries(fields.filter(key=>source[key]!==undefined).map(key=>[key,source[key]]));
+      update.updatedAt=new Date();update.updatedBy=session.user.id;
+      await collection.updateOne({_id:item._id},{$set:update});
+      return res.status(200).json({ok:true});
     }
     if(req.body?.action==='updateStore'){
       const allowed=session.user.role==='admin'||item.createdBy===session.user.id||item.ownerId===session.user.id;
