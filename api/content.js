@@ -6,9 +6,12 @@ import { handleSync } from '../lib/sync-handler.js';
 
 async function sessionFor(req){return auth.api.getSession({headers:fromNodeHeaders(req.headers)})}
 export default async function handler(req,res){
+  const origin=String(req.headers.origin||''),trusted=!origin||origin==='https://witch-map.vercel.app'||origin==='http://localhost:3000'||/^https:\/\/witch-map-[a-z0-9-]+\.vercel\.app$/.test(origin);
+  if(req.method!=='GET'&&!trusted)return res.status(403).json({message:'허용되지 않은 요청입니다.'});
+  if(req.method!=='GET'&&Number(req.headers['content-length']||0)>6*1024*1024)return res.status(413).json({message:'요청 파일이 너무 큽니다.'});
   if(req.query?.resource)return handleSync(req,res);
   const collection=database.collection('mapContent');
-  if(req.method==='GET'){await collection.updateMany({kind:'store',name:{$regex:'^해나루\\s*김밥$',$options:'i'},cozyReset20260822:{$ne:true}},{$set:{cozy:false,'featureVotes.cozy':0,'featureVoters.cozy':[],cozyReset20260822:true,updatedAt:new Date()}});const items=await collection.find({}).sort({createdAt:-1}).limit(500).toArray();return res.status(200).json({items:items.map(x=>({...x,id:String(x._id),_id:undefined}))})}
+  if(req.method==='GET'){res.setHeader('Cache-Control','public, s-maxage=10, stale-while-revalidate=30');const items=await collection.find({}).sort({createdAt:-1}).limit(500).toArray();return res.status(200).json({items:items.map(x=>({...x,id:String(x._id),_id:undefined}))})}
   const session=await sessionFor(req);if(!session?.user)return res.status(401).json({message:'로그인이 필요합니다.'});
   if(req.method==='POST'){
     const storeRequest=req.body?.kind==='store',ownerStore=session.user.userType==='owner'&&storeRequest;
@@ -51,9 +54,32 @@ export default async function handler(req,res){
       if(item.kind!=='store'||!allowed)return res.status(403).json({message:'해당 점주와 관리자만 가게 정보를 수정할 수 있습니다.'});
       const source=req.body.store||{},fields=['name','type','area','hours','phone','desc','image','menuBoard','ownerGallery','menus','businessStatus','closedDate','parking','publicParking','cozy','quiet','open24','solo','groupFriendly','pet','splitRoom'];
       const update=Object.fromEntries(fields.filter(key=>source[key]!==undefined).map(key=>[key,source[key]]));
+      if(item.reservationApprovalStatus==='approved'&&source.acceptingReservations!==undefined)update.acceptingReservations=!!source.acceptingReservations;
       update.updatedAt=new Date();update.updatedBy=session.user.id;
       await collection.updateOne({_id:item._id},{$set:update});
       return res.status(200).json({ok:true});
+    }
+    if(req.body?.action==='saveReview'){
+      if(item.kind!=='store')return res.status(400).json({message:'가게에만 후기를 작성할 수 있습니다.'});
+      const review=req.body?.review||{},reviewId=String(review.id||''),entries=Array.isArray(item.reviewEntries)?item.reviewEntries:[],index=entries.findIndex(x=>x.id===reviewId);
+      if(req.body.mode==='delete'){
+        if(index<0)return res.status(404).json({message:'후기를 찾지 못했습니다.'});
+        if(entries[index].userId!==session.user.id&&session.user.role!=='admin')return res.status(403).json({message:'본인이 작성한 후기만 삭제할 수 있습니다.'});
+        entries.splice(index,1);
+      }else{
+        const text=String(review.text||'').trim().slice(0,1000);if(!text)return res.status(400).json({message:'후기 내용을 입력해주세요.'});
+        if(index>=0){if(entries[index].userId!==session.user.id)return res.status(403).json({message:'본인이 작성한 후기만 수정할 수 있습니다.'});entries[index]={...entries[index],text,photo:review.photo===undefined?entries[index].photo:String(review.photo||''),updatedAt:new Date().toISOString()}}
+        else entries.push({id:reviewId||crypto.randomUUID(),userId:session.user.id,userName:session.user.name||'이용자',text,photo:String(review.photo||''),createdAt:new Date().toISOString()});
+      }
+      await collection.updateOne({_id:item._id},{$set:{reviewEntries:entries,updatedAt:new Date()}});return res.status(200).json({ok:true,reviewEntries:entries});
+    }
+    if(req.body?.action==='requestReservations'){
+      if(item.kind!=='store'||item.ownerId!==session.user.id)return res.status(403).json({message:'연결된 내 가게만 예약 기능을 신청할 수 있습니다.'});
+      await collection.updateOne({_id:item._id},{$set:{reservationApprovalStatus:'pending',acceptingReservations:false,reservable:false,reservationRequestedAt:new Date()}});return res.status(200).json({ok:true,status:'pending'});
+    }
+    if(req.body?.action==='approveReservations'){
+      if(session.user.role!=='admin')return res.status(403).json({message:'관리자만 예약 기능을 승인할 수 있습니다.'});
+      const approved=!!req.body.approved;await collection.updateOne({_id:item._id},{$set:{reservationApprovalStatus:approved?'approved':'rejected',acceptingReservations:approved,reservable:approved,reservationReviewedAt:new Date(),reservationReviewedBy:session.user.id}});return res.status(200).json({ok:true,status:approved?'approved':'rejected'});
     }
     if(req.body?.action==='updateNotice'){
       if(item.kind!=='notice'||session.user.role!=='admin')return res.status(403).json({message:'관리자만 공지를 수정할 수 있습니다.'});
