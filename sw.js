@@ -1,5 +1,5 @@
 const CACHE='adventure-map-shell-v1';
-const SHELL=['/','/index.html','/styles.css?v=20260823-3','/app.js?v=20260823-3','/naver-map-adapter.js','/favicon.svg','/assets/app-icon-192.png','/assets/app-icon-512.png','/privacy.html','/terms.html'];
+const SHELL=['/','/index.html','/styles.css?v=20260823-4','/app.js?v=20260823-4','/naver-map-adapter.js','/favicon.svg','/assets/app-icon-192.png','/assets/app-icon-512.png','/privacy.html','/terms.html'];
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(SHELL)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim())));
 self.addEventListener('fetch',event=>{const request=event.request,url=new URL(request.url);if(request.method!=='GET'||url.origin!==location.origin||url.pathname.startsWith('/api/'))return;event.respondWith(fetch(request).then(response=>{if(response.ok){const copy=response.clone();caches.open(CACHE).then(cache=>cache.put(request,copy))}return response}).catch(()=>caches.match(request).then(hit=>hit||caches.match('/index.html'))))});
