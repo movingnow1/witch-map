@@ -495,7 +495,7 @@ async function loadAccountIdentity(){if(!session)return;try{const data=await cro
 const applySessionBeforeIdentity=applyServerSession;applyServerSession=function(data){const ok=applySessionBeforeIdentity(data);if(ok)setTimeout(loadAccountIdentity,0);return ok};if(session)setTimeout(loadAccountIdentity,0);
 const ownerOpenBeforeIdentity=$('#openOwner').onclick;$('#openOwner').onclick=()=>{ownerOpenBeforeIdentity();if(session?.role==='owner')setTimeout(loadAccountIdentity,0)};
 $('#openAccountSettings').addEventListener('click',()=>setTimeout(loadAccountIdentity,0));
-function reportClientError(payload){try{const body=JSON.stringify(payload).slice(0,12000);navigator.sendBeacon?.('/api/client-error',new Blob([body],{type:'application/json'}))||fetch('/api/client-error',{method:'POST',headers:{'Content-Type':'application/json'},body,keepalive:true}).catch(()=>{})}catch{}}
+function reportClientError(payload){try{const body=JSON.stringify(payload).slice(0,12000);navigator.sendBeacon?.('/api/content?resource=client-error',new Blob([body],{type:'application/json'}))||fetch('/api/content?resource=client-error',{method:'POST',headers:{'Content-Type':'application/json'},body,keepalive:true}).catch(()=>{})}catch{}}
 window.addEventListener('error',event=>reportClientError({type:'error',message:event.message,source:event.filename,line:event.lineno,column:event.colno,stack:event.error?.stack||''}));
 window.addEventListener('unhandledrejection',event=>reportClientError({type:'unhandledrejection',message:String(event.reason?.message||event.reason||'Promise rejection'),stack:event.reason?.stack||''}));
 // 2026-08-23: 제보 검색·한적 시간 집계·계정별 후기·예약 승인·코스 추천
