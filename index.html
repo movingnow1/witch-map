@@ -10,7 +10,7 @@
   <link rel="manifest" href="/manifest.webmanifest" />
   <link rel="apple-touch-icon" href="/assets/app-icon-192.png" />
   <link rel="preconnect" href="https://oapi.map.naver.com" />
-  <link rel="stylesheet" href="styles.css?v=20260823-4" />
+  <link rel="stylesheet" href="styles.css?v=20260823-5" />
 </head>
 <body>
   <div id="particleField" aria-hidden="true"></div><div id="cursorGlow" aria-hidden="true"></div>
@@ -56,8 +56,8 @@
       </section>
 
       <aside class="side-panel">
-        <nav class="side-tabs" aria-label="우측 보기 전환"><button id="showPlacesSide" class="active">장소</button><button id="showVisitedSide" hidden>탐험 완료</button><button id="showCommunitySide">커뮤니티</button></nav>
-        <section id="visitedSidePanel" hidden><div class="community-side-head"><div><p class="eyebrow">MY ADVENTURE</p><h2>탐험 완료</h2></div></div><div id="visitedSideList" class="place-list"></div></section>
+        <nav class="side-tabs" aria-label="우측 보기 전환"><button id="showCourseSide" hidden>코스 추천</button><button id="showPlacesSide" class="active">장소</button><button id="showVisitedSide" hidden>탐험 완료</button><button id="showCommunitySide">커뮤니티</button></nav>
+        <section id="courseSidePanel" hidden><div class="community-side-head"><div><p class="eyebrow">MY COURSES</p><h2>코스 추천</h2></div></div><div id="courseSideContent"><div class="empty-adventure"><b>아직 추천한 코스가 없어요.</b><p>상단 코스 추천 버튼에서 상대방과 위치를 입력해보세요.</p></div></div></section><section id="visitedSidePanel" hidden><div class="community-side-head"><div><p class="eyebrow">MY ADVENTURE</p><h2>탐험 완료</h2></div></div><div id="visitedSideList" class="place-list"></div></section>
         <section id="communitySidePanel" hidden><div class="community-side-head"><div><p class="eyebrow">COMMUNITY</p><h2>모임 선택</h2></div><button id="createCommunitySide" class="primary">＋ 모임 만들기</button></div><div id="communitySideList" class="community-list"></div></section>
         <div id="placesSidePanel">
         <div class="panel-heading">
@@ -112,6 +112,6 @@
   <script src="app-config.js"></script>
   <script src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=0ms3n6yqf0&submodules=geocoder"></script>
   <script src="naver-map-adapter.js"></script>
-  <script src="app.js?v=20260823-4"></script>
+  <script src="app.js?v=20260823-5"></script>
 </body>
 </html>
